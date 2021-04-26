@@ -9,13 +9,22 @@ const util = require('util');
 //     database: 'travel-db'
 // });
 
-// Live Test DB
 let db_con = mysql.createConnection({
-    host: 'sql5.freesqldatabase.com',
-    user: 'sql5406277',
-    password: 't9Iqc3kfY9',
-    database: 'sql5406277'
+    host: '104.219.233.225',//'localhost',
+    user: 'bitbyte1_admin',
+    password: 'tariqsulehri',
+    database: 'bitbyte1_hms-db'
 });
+
+
+
+// Live Test DB
+// let db_con = mysql.createConnection({
+//     host: 'sql5.freesqldatabase.com',
+//     user: 'sql5406277',
+//     password: 't9Iqc3kfY9',
+//     database: 'sql5406277'
+// });
 
 
 // Connect to MySQL server

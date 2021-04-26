@@ -3,18 +3,10 @@ const auth = require('../middleware/auth');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const _ = require('lodash');
+let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 const database = require('../startup/dbconfig');
 
 const router = express.Router(); // instead this will work.
-
-var SUCCESS = { code: 1, success: true, message: "Success", result: null };
-var FAIL = { code: 0, success: false, message: "Fail" };
-var SOME_THONG_WENTWRONG = { code: 0, success: false, message: "Something went wrong" };
-
-var LOGIN = { code: 1, success: true, message: "Success", result: null, token: null };
-var LOGIN_FAIL = { code: 0, success: false, message: "Invalid Username or Password", result: null, token: null };
-
-var INVALID_INPUT = { code: 0, success: false, message: "Invalid input's", result: null };
 
 router.post('/api/users', async (req, res) => {
 
@@ -27,6 +19,8 @@ router.post('/api/users', async (req, res) => {
 
     try {
         const data = { ...req.body };
+
+        data.dob = new Date(data.dob);
 
         var salt = await bcrypt.genSalt(8);
         var passwordHash = await bcrypt.hash(data.password, salt);
@@ -108,7 +102,9 @@ router.post('/api/users', async (req, res) => {
 
     }
     catch (error) {
-        res.send(SOME_THONG_WENTWRONG);
+
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
@@ -130,7 +126,9 @@ router.put('/api/users/change_pass', async (req, res) => {
         res.send(SUCCESS);
     }
     catch (error) {
-        res.send(SOME_THONG_WENTWRONG);
+
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
@@ -171,12 +169,10 @@ router.put('/api/users', async (req, res) => {
         var pg_doctor_contact_no = data.pg_doctor_contact_no;
         var pg_doctor_address = data.pg_doctor_address;
 
-        var dob = dob.dobtoISOString().slice(0, 19).replace('T', ' ');
-        console.log(dob);
-
         let query = `UPDATE users SET    username = '${username}', 
                                          role_id = ${role_id},
                                          is_active = ${is_active},
+                                         dob =  STR_TO_DATE('${dob}','%m-%d-%y'),
                                          account_no = '${account_no}',
                                          bsb = '${bsb}',
                                          account_title = '${account_title}',
@@ -205,6 +201,7 @@ router.put('/api/users', async (req, res) => {
         res.send(SUCCESS);
     }
     catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
         res.send(SOME_THONG_WENTWRONG);
     }
 
@@ -225,8 +222,9 @@ router.get("/api/users/:id", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
@@ -247,8 +245,8 @@ router.get("/api/users", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
 

@@ -1,25 +1,27 @@
 const express = require('express');
 const router = express.Router();
-
-var SUCCESS = { code: 1, success: true, message: "Success", result: null };
-var FAIL = { code: 0, success: false, message: "Fail" };
-var SOME_THONG_WENTWRONG = { code: 0, success: false, message: "Something went wrong" };
-var INVALID_INPUT = { code: 0, success: false, message: "Invalid input's", result: null };
+const database = require('../startup/dbconfig');
+const { GetManagers, GetUser } = require('../helpers/data.helper')
+const { SendRequestMail } = require('../helpers/mail.notifications');
+let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
+const { } = require('../routes/notification');
 
 router.post("/api/client/create_request", async (req, res) => {
-    const { datetime, client_user_id, loc_attu, loc_long, request_status } = req.body;
+    let { datetime, client_user_id, loc_attu, loc_long, request_status, from_date, to_date, req_hours } = req.body;
 
-    if (!datetime || !client_user_id || !loc_attu || !loc_long) {
+    if (!datetime || !client_user_id || !loc_attu || !loc_long || from_date || to_date || req_hours) {
         INVALID_INPUT.result = req.body;
         return res.send(INVALID_INPUT);
     }
 
     try {
-        const data = { ...req.body };
-
-        console.log(data);
+        let data = { ...req.body };
 
         request_status = "SENT";
+
+        datetime = new Date(datetime);
+        from_date = new Date(datetime);
+        to_date = new Date(datetime);
 
         var params = [
             datetime,
@@ -28,48 +30,66 @@ router.post("/api/client/create_request", async (req, res) => {
             data.country,
             loc_attu,
             loc_long,
-            request_status
+            request_status,
+            from_date,
+            to_date,
+            req_hours
         ];
 
-        let query = `INSERT INTO  cleint_requests ( datetime, 
+        let query = `INSERT INTO  client_requests ( datetime, 
                                                     client_user_id, 
                                                     city, 
                                                     country, 
                                                     loc_attu,
                                                     loc_long,
                                                     request_status,
-                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ? ); `;
+                                                    from_date,
+                                                    to_date,
+                                                    req_hours
+                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
 
         var result = await database.query(query, params);
 
-        SUCCESS.message = "Request Sucessfully Submitted..."
-        SUCCESS.result = { username: data.username, password: passwordHash, email: data.email, role_id: data.role_id }
+        SUCCESS.message = "Request Sucessfully Submitted...";
+        SUCCESS.result = data;
+
+
+        var managers = await GetManagers();
+        var client = await GetUser(client_user_id);
+        var request_id = result.insertId;
+
+        await SendRequestMail(client, managers, "Client Request", request_id);  // 1 is Notification Type
         res.send(SUCCESS);
 
     }
     catch (error) {
+
+        SOME_THONG_WENTWRONG.message = error.message;
         res.send(SOME_THONG_WENTWRONG);
     }
 });
 
-router.post("/api/client/update_request", (req, res) => {
-    res.status(200).send("Post Client Request");
-});
+router.post("/api/client/feedback", async (req, res) => {
+    try {
 
-router.get("/api/client/requests/:client_id", (req, res) => {
-    res.status(200).send("Return all Clients");
-});
+        let { client_id, details, staff_id } = req.body;
 
-router.get("/api/client/requests_approved/:client_id", (req, res) => {
-    res.status(200).send("Return all Clients");
-});
+        if (!client_id || !details) {
+            res.status(400).send(INVALID_INPUT);
+        }
 
-router.get("/api/client/requests_rejected/:client_id", (req, res) => {
-    res.status(200).send("Return all Clients");
-});
+        let query = `INSERT INTO feedbacks (date, client_id, staff_id, details) 
+                     VALUES( NOW(), ${client_id} ,${staff_id}, '${details}' ); `;
 
-router.get("/api/client/:request_id/:id", (req, res) => {
-    res.status(200).send("Return all Clients");
+        var result = await database.query(query);
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
+    }
 });
 
 module.exports = router;

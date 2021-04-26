@@ -210,7 +210,7 @@ router.put('/api/users', async (req, res) => {
 router.get("/api/users/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        let query = `SELECT users.id, users.username, users.email, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id WHERE users.id=${id}; `;
+        let query = `SELECT users.*, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id WHERE users.id=${id}; `;
         var result = await database.query(query);
 
         if (!result[0]) {
@@ -233,7 +233,7 @@ router.get("/api/users/:id", async (req, res) => {
 router.get("/api/users", async (req, res) => {
     try {
 
-        let query = `SELECT users.id, users.username, users.email, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id; `;
+        let query = `SELECT  users.*, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id; `;
         var result = await database.query(query);
 
         if (!result[0]) {

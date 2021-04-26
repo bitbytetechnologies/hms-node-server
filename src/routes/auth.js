@@ -39,7 +39,7 @@ router.post('/api/auth', async (req, res) => {
             return res.send(LOGIN_FAIL);
         }
 
-        let query = `SELECT users.id, users.username, users.email, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id  WHERE email = '${email}' ; `;
+        let query = `SELECT users.*,  roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id  WHERE email = '${email}' ; `;
         var result = await database.query(query, params);
 
         if (!result[0]) {

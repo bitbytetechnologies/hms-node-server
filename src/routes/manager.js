@@ -5,63 +5,7 @@ const { GetUser } = require('../helpers/data.helper')
 const { SendRequestToStaffMail } = require('../helpers/mail.notifications');
 let { FAIL, SUCCESS, INVALID_INPUT } = require('../helpers/app_messages');
 
-router.get("/api/notification/:role_id", async (req, res) => {
-    try {
-        //role_id = 1 --> Manager
-        //role_id = 2 --> Staff
-        //role_id = 3 --> Cleint
-        var role_id = 0;
-        if (req.params.role_id) {
-            role_id = req.params['role_id']
-        }
 
-        let query = `SELECT count(*) as unread_messages FROM notifications WHERE send_to_role_id = ${role_id} and mark_read = 0; `;
-        var result = await database.query(query);
-
-        if (!result[0]) {
-            SUCCESS.result = null;
-            return res.status(200).send(SUCCESS);
-        }
-
-        SUCCESS.result = result;
-        return res.status(200).send(SUCCESS);
-
-    } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
-    }
-});
-
-router.post("/api/notification/mark_read", async (req, res) => {
-
-    const { req_id, user_id } = req.body;
-
-    try {
-        //role_id = 1 --> Manager
-        //role_id = 2 --> Staff
-        //role_id = 3 --> Cleint
-
-        let query = `UPDATE  notifications 
-                        SET  mark_read =  1,
-                        marked_user_id =  ${user_id},
-                        marked_date = now() 
-                      WHERE  ref_id = ${req_id} ; `;
-
-        var result = await database.query(query);
-
-        if (!result[0]) {
-            SUCCESS.result = null;
-            return res.status(200).send(SUCCESS);
-        }
-
-        SUCCESS.result = result;
-        return res.status(200).send(SUCCESS);
-
-    } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
-    }
-});
 
 router.post("/api/notification/staff_roster", async (req, res) => {
 

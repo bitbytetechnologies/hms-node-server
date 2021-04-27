@@ -136,7 +136,7 @@ router.get("/api/managers", async (req, res) => {
         //role_id = 2 --> Staff
         //role_id = 3 --> Cleint
 
-        let query = `SELECT users.id, users.username, users.email, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id and users.role_id=1; `;
+        let query = `SELECT users.*, roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id and users.role_id=1; `;
         var result = await database.query(query);
 
         if (!result[0]) {

@@ -8,7 +8,7 @@ require('./src/startup/config')(app);
 const port = process.env.PORT || 3200;
 
 http.createServer(app).listen(port, function () {
-    console.log(`Express server listening on port ${port}`);
+    console.log(`Server is listening on port ${port}`);
 });
 
 

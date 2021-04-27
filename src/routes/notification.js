@@ -1,103 +1,56 @@
 const auth = require('../middleware/auth');
-const bcrypt = require('bcrypt');
 const express = require('express');
-const _ = require('lodash');
 const database = require('../startup/dbconfig');
+const { SUCCESS, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 const router = express.Router(); // instead this will work.
 
-router.post('/api/notifications/client', async (req, res) => {
-
-    // const { username, email, password, role_id } = req.body;
-
-    // if (!username || !email || !password || !role_id) {
-    //     INVALID_INPUT.result = req.body;
-    //     return res.send(INVALID_INPUT);
-    // }
-
+router.get('/api/notifications/my/:user_id', async (req, res) => {
     try {
-        //     const data = { ...req.body };
 
-        //     data.dob = new Date(data.dob);
+        var id = !req.params.user_id ? 0 : req.params.user_id;
 
-        //     var salt = await bcrypt.genSalt(8);
-        //     var passwordHash = await bcrypt.hash(data.password, salt);
-        //     var params = [
-        //         data.username,
-        //         passwordHash,
-        //         data.password,
-        //         data.email,
-        //         data.role_id,
-        //         data.is_active,
-        //         data.dob,
-        //         data.account_no,
-        //         data.bsb,
-        //         data.account_title,
-        //         data.mobile_no,
-        //         data.nationality,
-        //         data.address,
-        //         data.emergency_contact,
-        //         data.ndis_no,
-        //         data.wwc_no,
-        //         data.car_reg_no,
-        //         data.drv_lic_no,
-        //         data.level_of_work,
-        //         data.disability_type,
-        //         data.parent_gaurdian_details,
-        //         data.last_address,
-        //         data.what_like,
-        //         data.pg_doctor,
-        //         data.pg_doctor_contact_no,
-        //         data.pg_doctor_address
-        //     ];
+        var query = `SELECT N.*,
+                            USR_SND.username as 'send_by_user', ROLE_SND.name as 'send_by_role', 
+                            USR_TO.username as 'send_to_user',  ROLE_TO.name as 'send_to_role' 
+                     FROM notifications N 
+               INNER JOIN users USR_SND  ON N.send_by_id      = USR_SND.Id
+               INNER JOIN roles ROLE_SND ON N.send_by_role_id = ROLE_SND.Id
+               INNER JOIN users USR_TO   ON N.send_to_id      = USR_TO.Id
+               INNER JOIN roles ROLE_TO  ON N.send_to_role_id = ROLE_TO.Id
+               WHERE N.send_to_id = ${id} ; `;
 
-        //     var duplicate = await CheckDuplicate(email);
+        result = await database.query(query);
+        SUCCESS.result = result[0] ? result : null;
+        res.status(200).send(SUCCESS);
+    }
+    catch (error) {
 
-        //     if (duplicate) {
-        //         FAIL.message = "Duplicate username or email..."
-        //         return res.json(FAIL);
-        //     }
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
 
-        //     let query = `INSERT INTO users ( username, 
-        //                                      password, 
-        //                                      password1, 
-        //                                      email, 
-        //                                      role_id,
-        //                                      is_active,
-        //                                      dob,
-        //                                      account_no,
-        //                                      bsb,
-        //                                      account_title,
-        //                                      mobile_no,
-        //                                      nationality,
-        //                                      address,
-        //                                      emergency_contact,
-        //                                      ndis_no,
-        //                                      wwc_no,
-        //                                      car_reg_no,
-        //                                      drv_lic_no,
-        //                                      level_of_work,
-        //                                      disability_type,
-        //                                      parent_gaurdian_details,
-        //                                      last_address,
-        //                                      what_like,
-        //                                      pg_doctor,
-        //                                      pg_doctor_contact_no,
-        //                                      pg_doctor_address
-        //                                     ) 
-        //                             VALUES ( ?, ?, ?, ?, ?, ?,
-        //                                      ?, ?, ?, ?, ?, ?, 
-        //                                      ?, ?, ?, ?, ?, ?,
-        //                                      ?, ?, ?, ?, ?, ?,
-        //                                      ?, ?
-        //                                      ); `;
+});
 
-        //     var result = await database.query(query, params);
+router.get('/api/notifications/sendby/:user_id', async (req, res) => {
+    try {
 
-        //     SUCCESS.message = "User sucessfuly registered..."
-        //     SUCCESS.result = { username: data.username, password: passwordHash, email: data.email, role_id: data.role_id }
-        res.send(SUCCESS);
+        var id = !req.params.user_id ? 0 : req.params.user_id;
 
+        var query = `SELECT N.*,
+                            USR_SND.username as 'send_by_user', ROLE_SND.name as 'send_by_role', 
+                            USR_TO.username as 'send_to_user',  ROLE_TO.name as 'send_to_role' 
+                     FROM notifications N 
+               INNER JOIN users USR_SND ON N.send_by_id = USR_SND.Id
+               INNER JOIN roles ROLE_SND ON N.send_by_role_id = ROLE_SND.Id
+               INNER JOIN users USR_TO ON N.send_to_id = USR_TO.Id
+               INNER JOIN roles ROLE_TO ON N.send_to_role_id = ROLE_TO.Id
+               WHERE N.send_by_id = ${id} ; `;
+
+        result = await database.query(query);
+
+        SUCCESS.result = result[0] ? result : null;
+        res.status(200).send(SUCCESS);
     }
     catch (error) {
 

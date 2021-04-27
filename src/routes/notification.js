@@ -22,7 +22,7 @@ router.get('/api/notifications/my/:user_id', async (req, res) => {
                INNER JOIN users USR_TO   ON N.send_to_id      = USR_TO.Id
                INNER JOIN roles ROLE_TO  ON N.send_to_role_id = ROLE_TO.Id
                LEFT OUTER JOIN client_requests CR on N.ref_id =  CR.id 
-               WHERE N.send_to_id = ${id} ; `;
+               WHERE N.send_to_id = ${id} and N.notification_type= 'Client Request' ; `;
 
         result = await database.query(query);
         SUCCESS.result = result[0] ? result : null;

@@ -88,24 +88,23 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
-    message = message + "<br/><br/><br/><br/>";
     message = message + "Dear " + toRoles.username + ",";
-    message = message + "<br/><br/><br/>";
+    message = message + "<br/>";
     message = message + "Please do advise if your can provide service to out client as per following Schedule :-" + "<br/><br/>";
     message = message + "<i>From Date : " + roster.from_date.toString() + "</i><br/>";
     message = message + "<i>To Date   : " + roster.to_date.toString() + "</i><br/>";
     message = message + "<i>From Time : " + roster.from_time.toString() + "</i><br/>";
     message = message + "<i>To Time   : " + roster.to_time.toString() + "</i><br/>";
-    message = message + "<br/><br/><br/><br/>";
+    message = message + "<br/>";
     message = message + "</strong><i>Regards</i> </strong>";
-    message = message + "<br/><br/>";
+    message = message + "<br/>";
     message = message + "<strong>" + username + "</strong>" + "<br/>";
     message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
     message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
     message = message + "<strong>" + email + "<strong>" + "<br/>";;
     message = message + "<strong>" + address + "<strong>" + "<br/>";;
-    message = message + "<br/>";
     message = message + "</body></html>";
+
 
     try {
         var transporter = nodemailer.createTransport({
@@ -156,9 +155,7 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
-    message = message + "<br/><br/><br/><br/>";
     message = message + "Dear Manger's,";
-    message = message + "<br/><br/><br/>";
     message = message + "Following Roster Request is approved:-" + "<br/><br/>";
     message = message + "<b>Request :   " + roster.req_id.toString() + "</b><br/>";
     message = message + "<b>Roster Id : " + roster.id.toString() + "</b><br/>";
@@ -166,9 +163,9 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     message = message + "<i>To Date   : " + roster.to_date.toString() + "</i><br/>";
     message = message + "<i>From Time : " + roster.from_time.toString() + "</i><br/>";
     message = message + "<i>To Time   : " + roster.to_time.toString() + "</i><br/>";
-    message = message + "<br/><br/><br/><br/>";
+    message = message + "<br/>";
     message = message + "</strong><i>Regards</i> </strong>";
-    message = message + "<br/><br/>";
+    message = message + "<br/>";
     message = message + "<strong>" + username + "</strong>" + "<br/>";
     message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
     message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;

@@ -12,12 +12,14 @@ router.get('/api/notifications/my/:user_id', async (req, res) => {
 
         var query = `SELECT N.*,
                             USR_SND.username as 'send_by_user', ROLE_SND.name as 'send_by_role', 
-                            USR_TO.username as 'send_to_user',  ROLE_TO.name as 'send_to_role' 
+                            USR_TO.username as 'send_to_user',  ROLE_TO.name as 'send_to_role',
+                            CR.approved , CR.Rejected 
                      FROM notifications N 
                INNER JOIN users USR_SND  ON N.send_by_id      = USR_SND.Id
                INNER JOIN roles ROLE_SND ON N.send_by_role_id = ROLE_SND.Id
                INNER JOIN users USR_TO   ON N.send_to_id      = USR_TO.Id
                INNER JOIN roles ROLE_TO  ON N.send_to_role_id = ROLE_TO.Id
+               LEFT OUTER JOIN client_requests CR on N.ref_id =  CR.id 
                WHERE N.send_to_id = ${id} ; `;
 
         result = await database.query(query);
@@ -72,7 +74,8 @@ router.get('/api/notifications', async (req, res) => {
                INNER JOIN users USR_SND ON N.send_by_id = USR_SND.Id
                INNER JOIN roles ROLE_SND ON N.send_by_role_id = ROLE_SND.Id
                INNER JOIN users USR_TO ON N.send_to_id = USR_TO.Id
-               INNER JOIN roles ROLE_TO ON N.send_to_role_id = ROLE_TO.Id ; `;
+               INNER JOIN roles ROLE_TO ON N.send_to_role_id = ROLE_TO.Id 
+               LEFT OUTER JOIN client_requests CR on N.ref_id =  CR.id ; `;
 
         result = await database.query(query);
 
@@ -86,7 +89,6 @@ router.get('/api/notifications', async (req, res) => {
     }
 
 });
-
 
 router.get("/api/notifications/count/:role_id", async (req, res) => {
     try {
@@ -117,7 +119,7 @@ router.get("/api/notifications/count/:role_id", async (req, res) => {
 
 router.post("/api/notifications/mark_read", async (req, res) => {
 
-    const { req_id, user_id } = req.body;
+    const { req_id, user_id, approved, rejected } = req.body;
 
     try {
         //role_id = 1 --> Manager
@@ -132,6 +134,13 @@ router.post("/api/notifications/mark_read", async (req, res) => {
 
         var result = await database.query(query);
 
+        let query1 = `UPDATE  client_requests
+                        SET  approved =  ${approved},
+                             rejected =  ${rejected}
+                      WHERE   id = ${req_id} ; `;
+
+        var result = await database.query(query1);
+
         if (!result[0]) {
             SUCCESS.result = null;
             return res.status(200).send(SUCCESS);
@@ -141,8 +150,8 @@ router.post("/api/notifications/mark_read", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        console.log(error.message);
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
 

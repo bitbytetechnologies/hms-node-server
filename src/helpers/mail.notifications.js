@@ -20,7 +20,7 @@ exports.SendUserMail = async (userObject) => {
 
     const { username, password, email } = userObject;
 
-    var mailToList = "tariq.sulehri@gmail.com";//email;
+    var mailToList = email;
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";

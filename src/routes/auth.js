@@ -7,13 +7,10 @@ const database = require('../startup/dbconfig');
 
 const router = express.Router(); // instead this will work.
 
-var SUCCESS = { code: 1, success: true, message: "Success", result: null };
-var FAIL = { code: 0, success: false, message: "Fail" };
 var SOME_THONG_WENTWRONG = { code: 0, success: false, message: "Something went wrong" };
 
 var LOGIN = { code: 1, success: true, message: "Success", result: null, token: null };
 var LOGIN_FAIL = { code: 0, success: false, message: "Invalid Username or Password", result: null, token: null };
-
 var INVALID_INPUT = { code: 0, success: false, message: "Invalid input's", result: null };
 
 router.post('/api/auth', async (req, res) => {
@@ -33,6 +30,11 @@ router.post('/api/auth', async (req, res) => {
         var userQuery = `SELECT users.id, password, users.email FROM users  WHERE email = '${email}';`;
         var result = await database.query(userQuery);
 
+        if (!result[0]) {
+            return res.send(LOGIN_FAIL);
+        }
+
+
         var isValidPassword = await bcrypt.compare(data.password, result[0].password);
 
         if (!isValidPassword) {
@@ -40,7 +42,7 @@ router.post('/api/auth', async (req, res) => {
         }
 
         let query = `SELECT users.*,  roles.name as rolename FROM users INNER JOIN roles ON users.role_id = roles.id  WHERE email = '${email}' ; `;
-        var result = await database.query(query, params);
+        result = await database.query(query, params);
 
         if (!result[0]) {
             return res.send(LOGIN_FAIL);

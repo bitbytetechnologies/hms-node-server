@@ -98,6 +98,7 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
     message = message + "<i>To Time   : " + roster.to_time.toString() + "</i><br/>";
     message = message + "<br/>";
     message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<br/>";
     message = message + "<strong>" + username + "</strong>" + "<br/>";
     message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
     message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
@@ -140,8 +141,8 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
 
     } catch (error) {
         console.log(error.message + "  ---- ");
-        FAIL.message = error.message;
-        return FAIL;
+        SOME_THONG_WENTWRONG.message = error.message;
+        return SOME_THONG_WENTWRONG;
     }
 
 }
@@ -167,6 +168,7 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     message = message + "<i>To Time   : " + roster.to_time.toString() + "</i><br/>";
     message = message + "<br/>";
     message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<br/>";
     message = message + "<strong>" + username + "</strong>" + "<br/>";
     message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
     message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
@@ -209,8 +211,8 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
 
     } catch (error) {
         console.log(error.message + "  ---- ");
-        FAIL.message = error.message;
-        return FAIL;
+        SOME_THONG_WENTWRONG.message = error.message;
+        return SOME_THONG_WENTWRONG;
     }
 
 }

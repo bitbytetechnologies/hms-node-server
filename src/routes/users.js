@@ -145,16 +145,12 @@ router.put('/api/users', async (req, res) => {
     try {
         const data = { ...req.body };
 
-        var now = new Date(data.dob);
-        var jsonDate = now.toJSON();
-        var dobDate = new Date(jsonDate);
-
-        console.log(dobDate);
+        var now = data.dob;
 
         var salt = await bcrypt.genSalt(8);
         var passwordHash = await bcrypt.hash(data.password, salt);
         var is_active = data.is_active;
-        var dob = now; //data.dob;
+        var dob = now.toString(); //data.dob;
         var account_no = data.account_no;
         var bsb = data.bsb;
         var account_title = data.account_title;
@@ -178,7 +174,7 @@ router.put('/api/users', async (req, res) => {
         let query = `UPDATE users SET    username = '${username}', 
                                          role_id = ${role_id},
                                          is_active = ${is_active},
-                                         dob =  DATE_TO_STRING(${dob}),
+                                         dob = '${now}',
                                          account_no = '${account_no}',
                                          bsb = '${bsb}',
                                          account_title = '${account_title}',
@@ -198,7 +194,7 @@ router.put('/api/users', async (req, res) => {
                                          pg_doctor = '${pg_doctor}',
                                          pg_doctor_contact_no = '${pg_doctor_contact_no}',
                                          pg_doctor_address = '${pg_doctor_address}'
-                                WHERE email = '${email}' ; `;
+                                WHERE email= '${email}' ; `;
 
         var result = await database.query(query);
 

@@ -7,6 +7,7 @@ var pool = mysql.createPool({
     user: 'root',
     password: '1234',
     database: 'travel-db'
+    //dateStrings: true
 });
 
 pool.getConnection((err, connection) => {

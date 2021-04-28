@@ -88,6 +88,7 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
+    message = message + "<br/";
     message = message + "Dear " + toRoles.username + ",";
     message = message + "<br/>";
     message = message + "Please do advise if your can provide service to out client as per following Schedule :-" + "<br/><br/>";
@@ -154,7 +155,9 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
+    message = message + "<br/";
     message = message + "Dear Manger's,";
+    message = message + "<br/";
     message = message + "Following Roster Request is approved:-" + "<br/><br/>";
     message = message + "<b>Request :   " + roster.req_id.toString() + "</b><br/>";
     message = message + "<b>Roster Id : " + roster.id.toString() + "</b><br/>";

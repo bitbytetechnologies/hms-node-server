@@ -66,7 +66,7 @@ router.post("/api/notification/staff_roster", async (req, res) => {
             });
         }
 
-        res.status(200).send(data);
+        res.status(200).send(SUCCESS);
 
     } catch (error) {
         console.log(error);

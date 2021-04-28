@@ -65,6 +65,7 @@ router.post("/api/staff/progress", async (req, res) => {
         var roster = await GetRoster(roster_id);
         var staff = await GetUser(staff_id);
         var clientRequest = await GetRequest(roster.req_id);
+
         //Date Parameter Format : yy-mm-dd 
         let query = `INSERT INTO staff_progress (date, roster_id, staff_id, roster_date, from_time, to_time, details) 
                      VALUES( NOW(),  ${staff_id}, ${roster_id}, STR_TO_DATE('${roster_date}', '%Y-%m-%d'), '${from_time}', '${to_time}', '${details}' ); `;

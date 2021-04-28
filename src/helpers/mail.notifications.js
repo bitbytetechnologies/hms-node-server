@@ -47,13 +47,13 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
             service: 'gmail',
             //secure: true,
             auth: {
-                user: "tariq.sulehri@gmail.com",
-                pass: "786Allahis1"
+                user: "hms029722@gmail.com",
+                pass: "#1234567"
             }
         });
 
         var mailOptions = {
-            from: "tariq.sulehri@gmail.com",
+            from: "hms029722@gmail.com",
             to: mailToList,    //'tariq.sulehri@gmail.com', // Can Add , Seprated List of Emails
             subject: "Client Request for Approval",
             html: message
@@ -115,8 +115,8 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
             service: 'gmail',
             //secure: true,
             auth: {
-                user: "tariq.sulehri@gmail.com",
-                pass: "786Allahis1"
+                user: "hms029722@gmail.com",
+                pass: "#1234567"
             }
         });
 
@@ -185,8 +185,8 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
             service: 'gmail',
             //secure: true,
             auth: {
-                user: "tariq.sulehri@gmail.com",
-                pass: "786Allahis1"
+                user: "hms029722@gmail.com",
+                pass: "#1234567"
             }
         });
 

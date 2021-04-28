@@ -15,7 +15,7 @@ router.post("/api/notification/staff_roster", async (req, res) => {
 
         var manager = await GetUser(manager_id);
 
-        if (!req_id || !manager_id || !manager_id <= 0 || !staff_requests || !staff_requests.length || !manager) {
+        if (!req_id || !manager_id || !staff_requests || !staff_requests.length || !manager) {
             return res.status(400).send(INVALID_INPUT);
         }
 

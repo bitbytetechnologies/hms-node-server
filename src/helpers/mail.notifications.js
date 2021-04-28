@@ -16,6 +16,68 @@ const componseToList = async (toRoles) => {
     return mailToString;
 }
 
+exports.SendUserMail = async (userObject) => {
+
+    const { username, password, email } = userObject;
+
+    var mailToList = "tariq.sulehri@gmail.com";//email;
+
+    let message = "<html><head></head><body>";
+    message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
+    message = message + "<br/><br/><br/><br/>";
+    message = message + "Dear Management,";
+    message = message + "<br/><br/><br/>";
+    message = message + "Your user details are as under:-";
+    message = message + "<br/>";
+    message = message + "<strong> User Full Name : " + username + "</strong>" + "<br/>";
+    message = message + "<strong> user Id :" + email + "<strong>" + "<br/>";
+    message = message + "<strong> password :" + password + "<strong>" + "<br/>";
+    message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<br/><br/>";
+    message = message + "<br/>";
+    message = message + "<b> HMS Management";
+    message = message + "</body></html>";
+
+    try {
+        var transporter = nodemailer.createTransport({
+            //service: 'googlemail.com',
+            //host: "smtp.googlemail.com",
+            //port: 465,
+            service: 'gmail',
+            //secure: true,
+            auth: {
+                user: "hms029722@gmail.com",
+                pass: "#1234567"
+            }
+        });
+
+        var mailOptions = {
+            from: "hms029722@gmail.com",
+            to: mailToList,    //'tariq.sulehri@gmail.com', // Can Add , Seprated List of Emails
+            subject: "HMS User Created",
+            html: message
+        };
+
+        await transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log("Email Sending Error:", error);
+            } else {
+                console.log("Email Sent: " + info.response);
+            }
+        });
+
+        SUCCESS.result = message;
+        return SUCCESS;
+
+    } catch (error) {
+        console.log(error.message + "  ---- ");
+        FAIL.message = error.message;
+        return FAIL;
+    }
+
+}
+
+
 exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id) => {
 
     const { username, nationality, mobile_no, email, address } = fromRole;
@@ -109,10 +171,10 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
 
     try {
         var transporter = nodemailer.createTransport({
-            //service: 'googlemail.com',
-            //host: "smtp.googlemail.com",
-            //port: 465,
-            service: 'gmail',
+            service: 'googlemail.com',
+            host: "smtp.googlemail.com",
+            port: 465,
+            //service: 'gmail',
             //secure: true,
             auth: {
                 user: "hms029722@gmail.com",
@@ -121,7 +183,7 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
         });
 
         var mailOptions = {
-            from: "tariq.sulehri@gmail.com",
+            from: "hms029722@gmail.com",
             to: mailToList,    //'tariq.sulehri@gmail.com', // Can Add , Seprated List of Emails
             subject: "Client Request for Approval",
             html: message

@@ -3,6 +3,7 @@ const auth = require('../middleware/auth');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const _ = require('lodash');
+const { SendUserMail } = require('../helpers/mail.notifications');
 let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 const database = require('../startup/dbconfig');
 
@@ -95,6 +96,8 @@ router.post('/api/users', async (req, res) => {
                                          ); `;
 
         var result = await database.query(query, params);
+
+        await SendUserMail(req.body);
 
         SUCCESS.message = "User sucessfuly registered..."
         SUCCESS.result = { username: data.username, password: passwordHash, email: data.email, role_id: data.role_id }

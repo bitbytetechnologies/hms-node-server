@@ -33,8 +33,7 @@ router.post("/api/staff/approve_roster", async (req, res) => {
 
             let query = `UPDATE  rosters 
                              SET  mark_read =  1,
-                             accept =  ${accept},
-                             reject  = ${reject} 
+                             accept =  ${accept}
              WHERE  id = ${ros.roster_id} ; `;
 
             var result = await database.query(query);
@@ -93,7 +92,7 @@ router.get("/api/staff/pending_rosters/:staff_id", async (req, res) => {
 
         var staff_id = req.params['staff_id']
 
-        let query = `SELECT * FROM rosters WHERE  send_to_id = '${staff_id}' and mark_read = '${0}' ; `;
+        let query = `SELECT * FROM rosters WHERE  send_to_id = '${staff_id}' and mark_read = '${0}'  ; `;
         var result = await database.query(query);
 
         if (!result[0]) {
@@ -110,5 +109,33 @@ router.get("/api/staff/pending_rosters/:staff_id", async (req, res) => {
     }
 
 });
+
+router.get("/api/staff/rosters/:staff_id", async (req, res) => {
+
+    try {
+        if (!req.params['staff_id']) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        var staff_id = req.params['staff_id']
+
+        let query = `SELECT * FROM rosters WHERE send_to_id = '${staff_id}' and accept=${1} ; `;
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
+    }
+
+});
+
 
 module.exports = router;

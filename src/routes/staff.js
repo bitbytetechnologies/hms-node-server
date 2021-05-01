@@ -4,8 +4,7 @@ const database = require('../startup/dbconfig');
 const date = require('date-and-time');
 const { GetUser, GetManagers, GetRequest, GetRoster } = require('../helpers/data.helper');
 const { SendRequestApprovalToManagement } = require('../helpers/mail.notifications');
-let { FAIL, SUCCESS, INVALID_INPUT } = require('../helpers/app_messages');
-
+let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 router.post("/api/staff/approve_roster", async (req, res) => {
 
@@ -82,7 +81,6 @@ router.post("/api/staff/progress", async (req, res) => {
     }
 });
 
-
 router.get("/api/staff/pending_rosters/:staff_id", async (req, res) => {
 
     try {
@@ -137,5 +135,173 @@ router.get("/api/staff/rosters/:staff_id", async (req, res) => {
 
 });
 
+router.get("/api/staff/medication/:staff_id", async (req, res) => {
+
+    try {
+        if (!req.params['staff_id']) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        var staff_id = req.params['staff_id']
+
+        let query = `SELECT * FROM rosters WHERE send_to_id = '${staff_id}' and accept=${1} ; `;
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
+    }
+
+});
+
+router.post("/api/staff_progress/report", async (req, res) => {
+
+    try {
+
+        const { staff_id, date } = req.body;
+
+        if (!staff_id || !date) {
+            return res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `SELECT * FROM staff_progress WHERE staff_id = ${staff_id} and roster_date = '${date}' ; `;
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
+    }
+
+});
+
+router.post("/api/staff/medication", async (req, res) => {
+    try {
+
+        let data = req.body;
+
+        if (!data || !data.length) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        var result = null;
+        var resp = await data.forEach(async (medication) => {
+            let { roster_id, type, is_taken, created_by, details } = medication;
+            let query = `INSERT INTO medications (date, roster_id, type, is_taken, created_by, details) 
+                           VALUES( NOW(), ${roster_id}, '${type}', '${is_taken}', '${created_by}', '${details}' ); `;
+
+            result = await database.query(query);
+            SUCCESS.result = result;
+        });
+
+        if (result) {
+            return res.status(200).send(SUCCESS);
+        } else {
+            return res.status(401).send(SOME_THONG_WENTWRONG);
+        }
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
+router.put("/api/staff/medication", async (req, res) => {
+    try {
+
+        let data = req.body;
+
+        if (!data || !data.length) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        var result = null;
+        var resp = await data.forEach(async (medication) => {
+            let { roster_id, type, is_taken, created_by, details } = medication;
+            let query = `UPDATE medications 
+                            SET is_taken = '${is_taken}',
+                            details = '${details}',
+                            created_by = '${created_by}'                   
+                         WHERE roster_id = ${roster_id} and type='${type}' ; `;
+            result = await database.query(query);
+            SUCCESS.result = result;
+        });
+
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
+
+router.get("/api/medication/summary", async (req, res) => {
+    try {
+
+        let { roster_id, type, is_taken, created_by, details } = req.body;
+
+        if (!roster_id || !type || !is_taken || !created_by) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        // var roster = await GetRoster(roster_id);
+        // var staff = await GetUser(staff_id);
+        // var clientRequest = await GetRequest(roster.req_id);
+
+        let query = `SELECT * FROM medications;
+                              SELECT type, COUNT(1) as total, 
+                              COUNT(1) / (SELECT COUNT(1) FROM medications) * 100 AS avg  
+                     FROM     medications 
+                 GROUP BY     type; `;
+
+        var result = await database.query(query);
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
+router.post("/api/medication/medication_list", async (req, res) => {
+    try {
+
+        const { roster_id, date } = req.body;
+
+        if (!roster_id || !date) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `SELECT * FROM medications
+                      WHERE   roster_id = ${roster_id} and date = '${date}' ; `;
+
+        var result = await database.query(query);
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
 
 module.exports = router;

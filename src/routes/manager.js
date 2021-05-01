@@ -97,6 +97,37 @@ router.get("/api/managers", async (req, res) => {
     }
 });
 
+router.post("/api/managers/staff_progress", async (req, res) => {
+
+    try {
+
+        const { date } = req.body;
+
+        if (!date) {
+            return res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `SELECT staff_progress.*, 
+                            users.username as staff_name , users.email as staff_email 
+                       FROM staff_progress  
+                 INNER JOIN users on staff_progress.staff_id = users.id WHERE roster_date = '${date}'  ; `;
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
+    }
+
+});
+
 module.exports = router;
 
 

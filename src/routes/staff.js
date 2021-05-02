@@ -199,21 +199,24 @@ router.post("/api/staff/medication", async (req, res) => {
             res.status(400).send(INVALID_INPUT);
         }
 
-        var result = null;
-        var resp = await data.forEach(async (medication) => {
-            let { roster_id, type, is_taken, created_by, details } = medication;
-            let query = `INSERT INTO medications (date, roster_id, type, is_taken, created_by, details) 
-                           VALUES( NOW(), ${roster_id}, '${type}', '${is_taken}', '${created_by}', '${details}' ); `;
+        var values = [];
+        data.forEach(medication => {
+            values.push(
+                [
+                    medication.date.toString(),
+                    medication.roster_id,
+                    medication.type,
+                    medication.is_taken,
+                    medication.created_by,
+                    medication.details]
+            )
+        })
 
-            result = await database.query(query);
-            SUCCESS.result = result;
-        });
+        let query = `INSERT INTO medications (date, roster_id, type, is_taken, created_by, details) VALUES ? ; `;
+        var result = await database.query(query, [values]);
 
-        if (result) {
-            return res.status(200).send(SUCCESS);
-        } else {
-            return res.status(401).send(SOME_THONG_WENTWRONG);
-        }
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
 
     } catch (error) {
         SOME_THONG_WENTWRONG.message = error.message;

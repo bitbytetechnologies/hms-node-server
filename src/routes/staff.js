@@ -256,9 +256,8 @@ router.put("/api/staff/medication", async (req, res) => {
 
 router.get("/api/medication/summary", async (req, res) => {
     try {
-
         let query = `SELECT   type, COUNT(1) as total, 
-                              COUNT(1) / (SELECT COUNT(1) FROM medications is_taken = 1) * 100 AS avg  
+                              COUNT(1) / (SELECT COUNT(1) FROM medications WHERE is_taken = 1) * 100 AS avg  
                      FROM     medications 
                      WHERE    is_taken = 1
                  GROUP BY     type; `;

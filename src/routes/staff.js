@@ -235,12 +235,12 @@ router.put("/api/staff/medication", async (req, res) => {
 
         var result = null;
         var resp = await data.forEach(async (medication) => {
-            let { roster_id, type, is_taken, created_by, details } = medication;
+            let { roster_id, type, is_taken, created_by, details, date } = medication;
             let query = `UPDATE medications 
                             SET is_taken = '${is_taken}',
                             details = '${details}',
                             created_by = '${created_by}'                   
-                         WHERE roster_id = ${roster_id} and type='${type}' ; `;
+                         WHERE roster_id = ${roster_id} and type='${type}' and date='${date}' ; `;
             result = await database.query(query);
             SUCCESS.result = result;
         });

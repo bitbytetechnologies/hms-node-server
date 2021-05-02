@@ -257,15 +257,6 @@ router.put("/api/staff/medication", async (req, res) => {
 router.get("/api/medication/summary", async (req, res) => {
     try {
 
-        let { roster_id, type, is_taken, created_by, details } = req.body;
-
-        if (!roster_id || !type || !is_taken || !created_by) {
-            res.status(400).send(INVALID_INPUT);
-        }
-
-        // var roster = await GetRoster(roster_id);
-        // var staff = await GetUser(staff_id);
-        // var clientRequest = await GetRequest(roster.req_id);
 
         let query = `SELECT * FROM medications;
                               SELECT type, COUNT(1) as total, 

@@ -13,7 +13,8 @@ let db_con = mysql.createConnection({
     host: '104.219.233.225',//'localhost',
     user: 'bitbyte1_admin',
     password: 'tariqsulehri',
-    database: 'bitbyte1_hms-db'
+    database: 'bitbyte1_hms-db',
+    timezone: 'Z'
 });
 
 

@@ -208,7 +208,8 @@ router.post("/api/staff/medication", async (req, res) => {
                     medication.type,
                     medication.is_taken,
                     medication.created_by,
-                    medication.details]
+                    medication.details
+                ]
             )
         })
 
@@ -283,9 +284,7 @@ router.post("/api/medication/medication_list", async (req, res) => {
         }
 
         let query = `SELECT * FROM medications
-                      WHERE   (roster_id = ${roster_id} and DATE(date) = '${date}') ; `;
-
-        console.log(query);
+                      WHERE   (roster_id = ${roster_id} and DATE(date) = '2021-05-02') ; `;
 
         var result = await database.query(query);
 

@@ -12,14 +12,14 @@ router.post("/api/staff/approve_roster", async (req, res) => {
 
     try {
 
-        let { accept, reject } = 0;
+        //  let { accept, reject } = 0;
 
         if (!data || !data.length) {
             res.status(400).send(INVALID_INPUT);
         }
 
-        accept = data.accept ? data.accept : 0;
-        reject = data.reject ? data.reject : 0;
+        // accept = data.accept ? data.accept : 0;
+        //  reject = data.reject ? data.reject : 0;
 
         var managers = await GetManagers();
 
@@ -32,7 +32,7 @@ router.post("/api/staff/approve_roster", async (req, res) => {
 
             let query = `UPDATE  rosters 
                              SET  mark_read =  1,
-                             accept =  ${accept}
+                             accept =  ${ros.accept}
              WHERE  id = ${ros.roster_id} ; `;
 
             var result = await database.query(query);
@@ -283,7 +283,9 @@ router.post("/api/medication/medication_list", async (req, res) => {
         }
 
         let query = `SELECT * FROM medications
-                      WHERE   roster_id = ${roster_id} and date = '${date}' ; `;
+                      WHERE   (roster_id = ${roster_id} and DATE(date) = '${date}') ; `;
+
+        console.log(query);
 
         var result = await database.query(query);
 

@@ -27,7 +27,7 @@ exports.GetUser = async function (clientId) {
                       INNER  JOIN roles ON users.role_id = roles.id 
                       WHERE  users.id = ${clientId} ; `;
         var result = await database.query(query);
-        return result[0] ? result[0] : null;
+        return result ? result[0] : null;
 
     } catch (error) {
         return null;

@@ -1,11 +1,129 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../startup/dbconfig');
-const { GetUser } = require('../helpers/data.helper')
-const { SendRequestToStaffMail } = require('../helpers/mail.notifications');
-let { FAIL, SUCCESS, INVALID_INPUT } = require('../helpers/app_messages');
+const { GetUser, GetRequest, GetRoster, GetManagers } = require('../helpers/data.helper')
+const { SendRequestToStaffMail, SendRequestMail } = require('../helpers/mail.notifications');
+let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
+
+router.post("/api/managers/create_request", async (req, res) => {
+    let { datetime, client_user_id, loc_attu, loc_long, request_status, from_date, to_date, req_hours, from_time, to_time, city, country, staff_id, manager_id } = req.body;
+
+    if (!datetime || !client_user_id || !loc_attu || !loc_long || !from_date || !to_date || !req_hours || !staff_id || !manager_id) {
+        INVALID_INPUT.result = req.body;
+        return res.send(INVALID_INPUT);
+    }
+
+    try {
+        let data = { ...req.body };
+        request_status = "SENT";
+
+        datetime = new Date(datetime);
+        from_date = new Date(from_date);
+        to_date = new Date(to_date);
+
+        var params = [
+            datetime,
+            client_user_id,
+            city,
+            country,
+            loc_attu,
+            loc_long,
+            request_status,
+            from_date,
+            to_date,
+            req_hours
+        ];
+
+        let query = `INSERT INTO  client_requests ( datetime, 
+                                                    client_user_id, 
+                                                    city, 
+                                                    country, 
+                                                    loc_attu,
+                                                    loc_long,
+                                                    request_status,
+                                                    from_date,
+                                                    to_date,
+                                                    req_hours
+                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+
+        var result = await database.query(query, params);
+
+        var managers = await GetManagers();
+        var client = await GetUser(client_user_id);
+        var request_id = result.insertId;
+        var client_request = await GetRequest(request_id);
+
+        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
+
+        let query1 = `UPDATE  notifications 
+                         SET  mark_read =  1,
+                              marked_user_id =  ${manager_id},
+                              marked_date = now() 
+                       WHERE  ref_id = ${request_id} ; `;
+
+        var result = await database.query(query1);
+
+        let query2 = `UPDATE  client_requests
+                        SET  approved =  ${1}
+                      WHERE  id = ${request_id} ; `;
+
+        var result = await database.query(query2);
 
 
+        /////////////////////////////////////////////////////////////////////////////
+        fromDate = new Date(from_date);
+        toDate = new Date(to_date);
+        manager_role_id = 3;
+        staff_role_id = 2;
+
+        var params = [
+            datetime,
+            request_id,
+            manager_id,
+            manager_role_id,
+            staff_id,
+            staff_role_id,
+            fromDate,
+            toDate,
+            from_time,
+            to_time,
+            req_hours
+        ];
+
+        let query3 = `INSERT INTO rosters(
+            datetime,
+            req_id,
+            send_by_id,
+            send_by_role_id,
+            send_to_id,
+            send_to_role_id,
+            from_date,
+            to_date,
+            from_time,
+            to_time,
+            hours
+           ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+
+        var result = await database.query(query3, params);
+        var roster_id = result.insertId;
+
+        var roster = await GetRoster(roster_id);
+        var manager = await GetUser(manager_id);
+
+        var staff = await GetUser(staff_id);
+
+        SUCCESS.message = "Request Generated Sucessfully...";
+        SUCCESS.result = data;
+        await SendRequestToStaffMail(manager, staff, "Staff Roster Request", request_id, roster);  // 1 is Notification Type
+
+        res.status(200).send(SUCCESS);
+    }
+    catch (error) {
+
+        SOME_THONG_WENTWRONG.message = error.message;
+        res.send(SOME_THONG_WENTWRONG);
+    }
+});
 
 router.post("/api/notification/staff_roster", async (req, res) => {
 

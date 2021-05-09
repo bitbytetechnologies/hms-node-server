@@ -17,6 +17,8 @@ router.post("/api/client/create_request", async (req, res) => {
     try {
         let data = { ...req.body };
 
+        let client_request = { ...req.body };
+
         request_status = "SENT";
 
         datetime = new Date(datetime);
@@ -58,7 +60,7 @@ router.post("/api/client/create_request", async (req, res) => {
         var client = await GetUser(client_user_id);
         var request_id = result.insertId;
 
-        await SendRequestMail(client, managers, "Client Request", request_id);  // 1 is Notification Type
+        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
         res.send(SUCCESS);
 
     }

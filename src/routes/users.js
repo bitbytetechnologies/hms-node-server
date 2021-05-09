@@ -235,6 +235,41 @@ router.get("/api/users/:id", async (req, res) => {
 });
 
 
+router.get("/api/users/:client_id/:staff_id", async (req, res) => {
+    try {
+
+        const client_id = req.params.client_id;
+        const staff_id = req.params.staff_id;
+
+        let query = `SELECT rq.*  ,client_user.username as client_name, client_user.email as client_email, 
+                             staff_user.id as staff_user_id ,staff_user.username as staff_name, 
+                             staff_user.email as staff_email  
+                      FROM   client_requests rq 
+               INNER  JOIN  rosters ros on ros.req_id =  rq.id
+               INNER  JOIN  users  client_user  on rq.client_user_id =  client_user.id
+               INNER  JOIN  users  staff_user   on ros.send_to_id    =  staff_user.id
+                      WHERE  client_user.id = ${client_id}  and staff_user.id = ${staff_id} ; `;
+
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+
+});
+
+
+
 router.get("/api/users", async (req, res) => {
     try {
 

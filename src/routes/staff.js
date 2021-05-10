@@ -53,9 +53,9 @@ router.post("/api/staff/approve_roster", async (req, res) => {
 router.post("/api/staff/progress", async (req, res) => {
     try {
 
-        let { staff_id, roster_id, roster_date, from_time, to_time, details } = req.body;
+        let { staff_id, roster_id, roster_date, from_time, to_time, details, bill_amount } = req.body;
 
-        if (!staff_id || !roster_id || !roster_date || !from_time || !to_time) {
+        if (!staff_id || !roster_id || !roster_date || !from_time || !to_time || !bill_amount) {
             res.status(400).send(INVALID_INPUT);
         }
 
@@ -64,9 +64,11 @@ router.post("/api/staff/progress", async (req, res) => {
         var staff = await GetUser(staff_id);
         var clientRequest = await GetRequest(roster.req_id);
 
+        roster_date = roster_date.toString();
+
         //Date Parameter Format : yy-mm-dd 
-        let query = `INSERT INTO staff_progress (date, roster_id, staff_id, roster_date, from_time, to_time, details) 
-                     VALUES( NOW(),  ${staff_id}, ${roster_id}, STR_TO_DATE('${roster_date}', '%Y-%m-%d'), '${from_time}', '${to_time}', '${details}' ); `;
+        let query = `INSERT INTO staff_progress (date, roster_id, staff_id, roster_date, from_time, to_time, details, bill_amount) 
+                     VALUES( NOW(),  ${staff_id}, ${roster_id}, '${roster_date}', '${from_time}', '${to_time}', '${details}', '${bill_amount}' ); `;
 
         var result = await database.query(query);
 
@@ -296,5 +298,130 @@ router.post("/api/medication/medication_list", async (req, res) => {
         return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
+
+
+router.post("/api/medication/incident_from", async (req, res) => {
+
+    var data = req.body;
+
+    try {
+
+        if (!data) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `INSERT INTO medication_incidents(
+                                            date,
+                                            support_worder,
+                                            report_completed_by,
+                                            medications,
+                                            medication_due_time,
+                                            dose_should_given,
+                                            dose_given,
+                                            describe_medication_incident,
+                                            resson_for_incident,
+                                            action_taken,
+                                            coodinator_notified,
+                                            doctor_notified,
+                                            pharmacist_notified,
+                                            kin_notified,
+                                            treatment_by,
+                                            coordinator_to_complete,
+                                            evaluation,
+                                            issue_resolved,
+                                            no_improvement,
+                                            improvement_describe,
+                                            closed_outcome,
+                                            roster_id,
+                                            filled_by_user,
+                                            created_at,
+                                            updated_at)
+                                    VALUES(
+                                            '${data.date}',
+                                            '${data.support_worder}',
+                                            '${data.report_completed_by}',
+                                            '${data.medications}',
+                                            '${data.medication_due_time}',
+                                            '${data.dose_should_given}',
+                                            '${data.dose_given}',
+                                            '${data.describe_medication_incident}',
+                                            '${data.resson_for_incident}',
+                                            '${data.action_taken}',
+                                            '${data.coodinator_notified}',
+                                            '${data.doctor_notified}',
+                                            '${data.pharmacist_notified}',
+                                            '${data.kin_notified}',
+                                            '${data.treatment_by}',
+                                            '${data.coordinator_to_complete}',
+                                            '${data.evaluation}',
+                                            '${data.issue_resolved}',
+                                            '${data.no_improvement}',
+                                            '${data.improvement_describe}',
+                                            '${data.closed_outcome}',
+                                            '${data.roster_id}',
+                                            '${data.filled_by_user}',
+                                            now(),
+                                            now()
+                                   ); `;
+
+        var result = await database.query(query);
+
+        SUCCESS.result = data;  //result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
+router.put("/api/medication/incident_from", async (req, res) => {
+
+    var data = req.body;
+
+    try {
+
+        if (!data) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `UPDATE medication_incidents 
+                                      SET   date='${data.date}',
+                                            support_worder='${data.support_worder}',
+                                            report_completed_by='${data.report_completed_by}',
+                                            medications='${data.medications}',
+                                            medication_due_time= '${data.medication_due_time}',
+                                            dose_should_given= '${data.dose_should_given}',
+                                            dose_given='${data.dose_given}',
+                                            describe_medication_incident='${data.describe_medication_incident}',
+                                            resson_for_incident= '${data.resson_for_incident}',
+                                            action_taken='${data.action_taken}',
+                                            coodinator_notified='${data.coodinator_notified}',
+                                            doctor_notified='${data.doctor_notified}',
+                                            pharmacist_notified= '${data.pharmacist_notified}',
+                                            kin_notified= '${data.kin_notified}',
+                                            treatment_by= '${data.treatment_by}',
+                                            coordinator_to_complete= '${data.coordinator_to_complete}',
+                                            evaluation= '${data.evaluation}',
+                                            issue_resolved= '${data.issue_resolved}',
+                                            no_improvement=  '${data.no_improvement}',
+                                            improvement_describe= '${data.improvement_describe}',
+                                            closed_outcome=  '${data.closed_outcome}',
+                                            roster_id=   '${data.roster_id}',
+                                            filled_by_user='${data.filled_by_user}',
+                                            updated_at=  now()
+                                   ; `;
+
+        var result = await database.query(query);
+
+        SUCCESS.result = data;  //result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
 
 module.exports = router;

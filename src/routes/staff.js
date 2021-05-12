@@ -45,8 +45,8 @@ router.post("/api/staff/approve_roster", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
 
@@ -78,8 +78,8 @@ router.post("/api/staff/progress", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
 
@@ -104,11 +104,40 @@ router.get("/api/staff/pending_rosters/:staff_id", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
+
+
+router.get("/api/staff/roster/resport/:roster_id", async (req, res) => {
+
+    try {
+        if (!req.params['roster_id']) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        var staff_id = req.params['staff_id']
+
+        let query = `SELECT * FROM rosters WHERE id = '${roster_id}'  ; `;
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+
+});
+
 
 router.get("/api/staff/rosters/:staff_id", async (req, res) => {
 
@@ -131,8 +160,8 @@ router.get("/api/staff/rosters/:staff_id", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
@@ -158,8 +187,8 @@ router.get("/api/staff/medication/:staff_id", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });
@@ -186,8 +215,8 @@ router.post("/api/staff_progress/report", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 
 });

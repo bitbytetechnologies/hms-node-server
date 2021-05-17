@@ -445,7 +445,7 @@ router.put("/api/medication/incident_from", async (req, res) => {
                                             filled_by_user='${data.filled_by_user}',
                                             updated_at=  now(),
                                             vkey = '${data.vkey}'
-                                   ; `;
+                                            WHERE id = '${data.id}' ; `;
 
         var result = await database.query(query);
 

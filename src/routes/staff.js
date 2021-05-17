@@ -240,14 +240,16 @@ router.post("/api/staff/medication", async (req, res) => {
                     medication.is_taken,
                     medication.created_by,
                     medication.details,
-                    incident_form_id
+                    incident_form_id,
+                    vkey
                 ]
             )
         })
 
-        let query = `INSERT INTO medications (date, roster_id, type, is_taken, incident_form_id , created_by, details) VALUES ? ; `;
+        let query = `INSERT INTO medications (date, roster_id, type, is_taken,  created_by, details, incident_form_id, vkey) VALUES ? ; `;
         var result = await database.query(query, [values]);
 
+        result.id = result.insertId;
         SUCCESS.result = result;
         return res.status(200).send(SUCCESS);
 
@@ -273,7 +275,8 @@ router.put("/api/staff/medication", async (req, res) => {
                             SET is_taken = '${is_taken}',
                             incident_form_id = '${incident_form_id}',
                             details = '${details}',
-                            created_by = '${created_by}'                   
+                            created_by = '${created_by}',
+                            vkey = '${vkey}                   
                          WHERE roster_id = ${roster_id} and type='${type}' and date='${date}' ; `;
             result = await database.query(query);
             SUCCESS.result = result;
@@ -366,7 +369,8 @@ router.post("/api/medication/incident_from", async (req, res) => {
                                             roster_id,
                                             filled_by_user,
                                             created_at,
-                                            updated_at)
+                                            updated_at,
+                                            vkey)
                                     VALUES(
                                             '${data.date}',
                                             '${data.support_worder}',
@@ -392,7 +396,8 @@ router.post("/api/medication/incident_from", async (req, res) => {
                                             '${data.roster_id}',
                                             '${data.filled_by_user}',
                                             now(),
-                                            now()
+                                            now(),
+                                            '${data.vkey}'
                                    ); `;
 
         var result = await database.query(query);
@@ -440,7 +445,8 @@ router.put("/api/medication/incident_from", async (req, res) => {
                                             closed_outcome=  '${data.closed_outcome}',
                                             roster_id=   '${data.roster_id}',
                                             filled_by_user='${data.filled_by_user}',
-                                            updated_at=  now()
+                                            updated_at=  now(),
+                                            vkey = '${data.vkey}'
                                    ; `;
 
         var result = await database.query(query);

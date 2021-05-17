@@ -240,8 +240,7 @@ router.post("/api/staff/medication", async (req, res) => {
                     medication.is_taken,
                     medication.created_by,
                     medication.details,
-                    // incident_form_id,
-                    vkey
+                    medication.vkey
                 ]
             )
         })
@@ -270,7 +269,7 @@ router.put("/api/staff/medication", async (req, res) => {
 
         var result = null;
         var resp = await data.forEach(async (medication) => {
-            let { roster_id, type, is_taken, created_by, details, date } = medication;
+            let { roster_id, type, is_taken, created_by, details, vkey, date } = medication;
             let query = `UPDATE medications 
                             SET is_taken = '${is_taken}',
                             details = '${details}',

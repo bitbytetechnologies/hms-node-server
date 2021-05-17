@@ -317,7 +317,8 @@ router.post("/api/medication/medication_list", async (req, res) => {
             res.status(400).send(INVALID_INPUT);
         }
 
-        let query = `SELECT * FROM medications
+        let query = ` SELECT m.*, i.id as form_id FROM medications m 
+                      LEFT OUTER JOIN medication_incidents i on m.vkey = i .vkey
                       WHERE   (roster_id = ${roster_id} and date = '${date}') ; `;
 
         var result = await database.query(query);

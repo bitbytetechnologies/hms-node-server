@@ -240,13 +240,13 @@ router.post("/api/staff/medication", async (req, res) => {
                     medication.is_taken,
                     medication.created_by,
                     medication.details,
-                    incident_form_id,
+                    // incident_form_id,
                     vkey
                 ]
             )
         })
 
-        let query = `INSERT INTO medications (date, roster_id, type, is_taken,  created_by, details, incident_form_id, vkey) VALUES ? ; `;
+        let query = `INSERT INTO medications (date, roster_id, type, is_taken,  created_by, details,  vkey) VALUES ? ; `;
         var result = await database.query(query, [values]);
 
         result.id = result.insertId;
@@ -273,7 +273,6 @@ router.put("/api/staff/medication", async (req, res) => {
             let { roster_id, type, is_taken, created_by, details, date } = medication;
             let query = `UPDATE medications 
                             SET is_taken = '${is_taken}',
-                            incident_form_id = '${incident_form_id}',
                             details = '${details}',
                             created_by = '${created_by}',
                             vkey = '${vkey}                   
@@ -320,7 +319,7 @@ router.post("/api/medication/medication_list", async (req, res) => {
         }
 
         let query = `SELECT * FROM medications
-                      WHERE   (roster_id = ${roster_id} and DATE(date) = '${date}') ; `;
+                      WHERE   (roster_id = ${roster_id} and date = '${date}') ; `;
 
         var result = await database.query(query);
 

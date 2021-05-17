@@ -332,7 +332,6 @@ router.post("/api/medication/medication_list", async (req, res) => {
     }
 });
 
-
 router.post("/api/medication/incident_from", async (req, res) => {
 
     var data = req.body;
@@ -459,5 +458,28 @@ router.put("/api/medication/incident_from", async (req, res) => {
     }
 });
 
+router.get("/api/medication/incident_from/:id", async (req, res) => {
+
+    var data = req.body;
+
+    try {
+
+        if (!data) {
+            res.status(400).send(INVALID_INPUT);
+        }
+
+        let query = `SELECT * from medication_incidents 
+                     WHERE id= '${req.params.id}' ; `;
+
+        var result = await database.query(query);
+
+        SUCCESS.result = result[0] ? result[0] : null;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
 
 module.exports = router;

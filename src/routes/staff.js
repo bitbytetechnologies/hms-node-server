@@ -319,7 +319,7 @@ router.post("/api/medication/medication_list", async (req, res) => {
 
         let query = ` SELECT m.*, i.id as form_id FROM medications m 
                       LEFT OUTER JOIN medication_incidents i on m.vkey = i .vkey
-                      WHERE   (roster_id = ${roster_id} and date = '${date}') ; `;
+                      WHERE   (m.roster_id = ${roster_id} and m.date = '${date}') ; `;
 
         var result = await database.query(query);
 

@@ -221,6 +221,51 @@ router.post("/api/staff_progress/report", async (req, res) => {
 
 });
 
+router.get("/api/staff_progress/bill/:request_id", async (req, res) => {
+
+    try {
+
+        let query = `SELECT  rq.*, ros.id as roster_id, progress.id as progress_id ,client_user.username as client_name, client_user.email as client_email, 
+                             staff_user.id as staff_user_id ,staff_user.username as staff_name, staff_user.email as staff_email,
+                             nullif(progress.bill_amount , 0) as bill_amount
+                    FROM   client_requests rq 
+                    INNER  JOIN  rosters ros on ros.req_id =  rq.id
+                    INNER  JOIN  users  client_user  on rq.client_user_id =  client_user.id
+                    INNER  JOIN  users  staff_user   on ros.send_to_id    =  staff_user.id
+                    INNER  JOIN  staff_progress  progress on ros.id =  progress.roster_id
+                    WHERE  rq.id = '${req.params.request_id}' ; `;
+
+        var result = await database.query(query);
+
+        let query1 = `SELECT  sum(nullif(progress.bill_amount , 0)) as bill_amount
+                                FROM   client_requests rq 
+                                INNER  JOIN  rosters ros on ros.req_id =  rq.id
+                                INNER  JOIN  users  client_user  on rq.client_user_id =  client_user.id
+                                INNER  JOIN  users  staff_user   on ros.send_to_id    =  staff_user.id
+                                INNER  JOIN  staff_progress  progress on ros.id =  progress.roster_id
+                                WHERE  rq.id = '${req.params.request_id}' ; `;
+
+        var result1 = await database.query(query1);
+        console.log(result1);
+
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.total_amount = result1[0] ? result1[0].bill_amount : 0;
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+
+});
+
+
 router.post("/api/staff/medication", async (req, res) => {
     try {
 

@@ -68,7 +68,7 @@ router.post("/api/staff/progress", async (req, res) => {
 
         //Date Parameter Format : yy-mm-dd 
         let query = `INSERT INTO staff_progress (date, roster_id, staff_id, roster_date, from_time, to_time, details, bill_amount) 
-                     VALUES( NOW(),  ${staff_id}, ${roster_id}, '${roster_date}', '${from_time}', '${to_time}', '${details}', '${bill_amount}' ); `;
+                     VALUES( NOW(),  ${roster_id}, ${staff_id}, '${roster_date}', '${from_time}', '${to_time}', '${details}', '${bill_amount}' ); `;
 
         var result = await database.query(query);
 

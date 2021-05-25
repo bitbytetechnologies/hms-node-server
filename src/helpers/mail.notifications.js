@@ -78,26 +78,32 @@ exports.SendUserMail = async (userObject) => {
 }
 
 
-exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id) => {
+exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id, client_request) => {
 
     const { username, nationality, mobile_no, email, address } = fromRole;
+
+    console.log(client_request)
 
     var mailToList = await componseToList(toRoles);
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
-    message = message + "<br/><br/><br/><br/>";
-    message = message + "Dear Management,";
-    message = message + "<br/><br/><br/>";
-    message = message + "Please do accept Test Notification:-";
-    message = message + "<br/><br/><br/><br/>";
-    message = message + "</strong><i>Regards</i> </strong>";
     message = message + "<br/><br/>";
+    message = message + "Dear Management,";
+    message = message + "<br/>";
+    message = message + "Please do accept Test Notification:-" + "<br/>";
+    message = message + "<i>City   : " + client_request.city + "</i><br/>";
+    message = message + "<i>Country   : " + client_request.country + "</i><br/>";
+    message = message + "<i>From Date : " + client_request.from_date + "</i><br/>";
+    message = message + "<i>To Date   : " + client_request.to_date + "</i><br/>";
+    message = message + "<br/><br/>";
+    message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<br/>";
     message = message + "<strong>" + username + "</strong>" + "<br/>";
     message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
     message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
     message = message + "<strong>" + email + "<strong>" + "<br/>";;
-    message = message + "<strong>" + address + "<strong>" + "<br/>";;
+    message = message + "<strong>" + address + "<strong>" + "<br/>";
     message = message + "<br/>";
     message = message + "</body></html>";
 
@@ -189,7 +195,10 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
             html: message
         };
 
-        var mailResult = await SaveRequestNotification(fromRole, toRoles, message, notificationType, request_id);
+        var roles = []
+        roles.push(toRoles);
+
+        var mailResult = await SaveRequestNotification(fromRole, roles, message, notificationType, request_id);
         await transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log("Email Sending Error:", error);
@@ -228,6 +237,7 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     message = message + "<i>To Date   : " + roster.to_date.toString() + "</i><br/>";
     message = message + "<i>From Time : " + roster.from_time.toString() + "</i><br/>";
     message = message + "<i>To Time   : " + roster.to_time.toString() + "</i><br/>";
+
     message = message + "<br/>";
     message = message + "</strong><i>Regards</i> </strong>";
     message = message + "<br/>";
@@ -254,7 +264,7 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
 
         var mailOptions = {
             from: "tariq.sulehri@gmail.com",
-            to: mailToList,    //'tariq.sulehri@gmail.com', // Can Add , Seprated List of Emails
+            to: mailToList,
             subject: "Client Request for Approval",
             html: message
         };
@@ -278,8 +288,6 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     }
 
 }
-
-
 
 async function SaveRequestNotification(fromRole, toRoles, notificationText, notificationType, request_id) {
 
@@ -334,5 +342,56 @@ async function SaveRequestNotification(fromRole, toRoles, notificationText, noti
     }
 
 }
+
+async function SaveRosterNotification(fromRole, toRole, notificationText, notificationType, request_id) {
+
+    var date = new Date();
+    var send_by_id = fromRole.id;
+    var send_by_email = fromRole.email.toString();
+    var send_by_role_id = fromRole.role_id;
+
+    notificationType = notificationType ? notificationType : "Undefined";
+
+    try {
+
+        var params = [];
+
+        params = [
+            date,
+            request_id,
+            notificationType,
+            send_by_id,
+            send_by_email,
+            send_by_role_id,
+            notificationText,
+            toRole.email.toString(),
+            toRole.id,
+            toRole.role_id
+        ];
+
+        let query = `INSERT INTO notifications (
+                                     date,
+                                     ref_id,
+                                     notification_type,
+                                     send_by_id,
+                                     send_by_email,
+                                     send_by_role_id,
+                                     notification_text,
+                                     send_to_email,
+                                     send_to_id,
+                                     send_to_role_id
+                                ) 
+                       VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+
+        var result = await database.query(query, params);
+        return true;
+
+    } catch (error) {
+        console.log(error.message);
+        return false;
+    }
+
+}
+
 
 //module.exports = SendMail;

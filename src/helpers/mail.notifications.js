@@ -217,7 +217,7 @@ exports.SendRequestRejectOrApprovedMail = async (manager, client, notificationTy
             html: message
         };
 
-        var mailResult = await SaveRequestNotification(manager, client, message, notificationType, request_id);
+        var mailResult = await SaveRequestApprovalNotification(manager, client, message, notificationType, request_id);
 
         await transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -316,7 +316,7 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     const { username, nationality, mobile_no, email, address } = fromRole;
     const request_id = clientRequest.id;
 
-    var mailToList = await componseToList(toRoles);
+    var mailToList = toRoles.email;
 
     // var date = moment(new Date());
     // date = date.clone().tz("Australia/Sydney");
@@ -381,6 +381,57 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
         console.log(error.message + "  ---- ");
         SOME_THONG_WENTWRONG.message = error.message;
         return SOME_THONG_WENTWRONG;
+    }
+
+}
+
+async function SaveRequestApprovalNotification(fromRole, toRoles, notificationText, notificationType, request_id) {
+
+    var date = new Date();
+    var send_by_id = fromRole.id;
+    var send_by_email = fromRole.email.toString();
+    var send_by_role_id = fromRole.role_id;
+
+    notificationType = notificationType ? notificationType : "Undefined";
+
+    try {
+
+        var params = [];
+
+        params = [
+            date,
+            request_id,
+            notificationType,
+            send_by_id,
+            send_by_email,
+            send_by_role_id,
+            notificationText,
+            toRoles.email.toString(),
+            toRoles.id,
+            toRoles.role_id
+        ];
+
+        let query = `INSERT INTO notifications (
+                                     date,
+                                     ref_id,
+                                     notification_type,
+                                     send_by_id,
+                                     send_by_email,
+                                     send_by_role_id,
+                                     notification_text,
+                                     send_to_email,
+                                     send_to_id,
+                                     send_to_role_id
+                                ) 
+                       VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+
+        var result = await database.query(query, params);
+
+        return true;
+
+    } catch (error) {
+        console.log(error.message);
+        return false;
     }
 
 }

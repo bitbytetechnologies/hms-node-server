@@ -2,6 +2,7 @@ const auth = require('../middleware/auth');
 const express = require('express');
 const database = require('../startup/dbconfig');
 const { SendRequestMail } = require('../helpers/mail.notifications');
+const { GetRequest, GetUser } = require('../helpers/data.helper');
 const { SUCCESS, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 const router = express.Router(); // instead this will work.
@@ -138,12 +139,12 @@ router.post("/api/notifications/mark_read", async (req, res) => {
         var result = await database.query(query);
 
         let query1 = `UPDATE  client_requests
-                        SET  approved =  ${approved}
+                        SET   approved =  ${approved}
                       WHERE   id = ${req_id} ; `;
 
         var result = await database.query(query1);
 
-        var manager = await await GetUser(client_user_id);
+        var manager = await GetUser(client_user_id);
         var client = await GetUser(client_user_id);
         var request = await GetRequest(request_id)
 

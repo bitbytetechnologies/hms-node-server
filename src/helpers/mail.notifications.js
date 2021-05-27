@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const database = require('../startup/dbconfig');
+const { GetRequest } = require('./data.helper');
 let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 const componseToList = async (toRoles) => {
@@ -100,10 +101,12 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
     message = message + "Dear Management,";
     message = message + "<br/>";
     message = message + "Please do accept Test Notification:-" + "<br/>";
-    message = message + "<i>City   : " + client_request.city + "</i><br/>";
+    message = message + "<i>City   :    " + client_request.city + "</i><br/>";
     message = message + "<i>Country   : " + client_request.country + "</i><br/>";
     message = message + "<i>From Date : " + client_request.from_date + "</i><br/>";
     message = message + "<i>To Date   : " + client_request.to_date + "</i><br/>";
+    message = message + "<i>From Time : " + client_request.from_time + "</i><br/>";
+    message = message + "<i>From Time : " + client_request.to_time + "</i><br/>";
     message = message + "<br/><br/>";
     message = message + "</strong><i>Regards</i> </strong>";
     message = message + "<br/>";
@@ -130,7 +133,7 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
 
         var mailOptions = {
             from: "hms029722@gmail.com",
-            to: mailToList,    //'tariq.sulehri@gmail.com', // Can Add , Seprated List of Emails
+            to: mailToList,
             subject: "Client Request for Approval",
             html: message
         };

@@ -159,13 +159,13 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
 
 }
 
-exports.SendRequestRejectOrApprovedMail = async (fromRole, toRoles, notificationType, request_id, client_request) => {
+exports.SendRequestRejectOrApprovedMail = async (manager, client, notificationType, request_id, client_request) => {
 
-    const { username, nationality, mobile_no, email, address } = fromRole;
+    const { username, nationality, mobile_no, email, address } = client;
 
-    console.log(client_request)
+    var mailToList = client.email;
 
-    var mailToList = await componseToList(toRoles);
+    request_status = 'Client Request Approved' ? "Approved" : "Rejected"
 
     var date = moment(new Date());
     date = date.clone().tz("Australia/Sydney");
@@ -175,9 +175,14 @@ exports.SendRequestRejectOrApprovedMail = async (fromRole, toRoles, notification
     //message = message + "<strong> Dated : " + date.toString() + "</strong>";
 
     message = message + "<br/><br/>";
-    message = message + "Dear Management,";
+    message = message + `Dear ${client.username},`;
     message = message + "<br/>";
-    message = message + "Please do accept Test Notification:-" + "<br/>";
+    message = message + "Your Request has been " + request_status + "<br/>";
+    message = message + "<strong>" + username + "</strong>" + "<br/>";
+    message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
+    message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
+    message = message + "<strong>" + email + "<strong>" + "<br/>";;
+    message = message + "<strong>" + address + "<strong>" + "<br/>";
     message = message + "<i>City   :    " + client_request.city + "</i><br/>";
     message = message + "<i>Country   : " + client_request.country + "</i><br/>";
     message = message + "<i>From Date : " + client_request.from_date + "</i><br/>";
@@ -186,12 +191,9 @@ exports.SendRequestRejectOrApprovedMail = async (fromRole, toRoles, notification
     message = message + "<i>From Time : " + client_request.to_time + "</i><br/>";
     message = message + "<br/><br/>";
     message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<strong>" + manager.username + "</strong>" + "<br/>";
+    message = message + "<strong>" + manager.email + "</strong>" + "<br/>";
     message = message + "<br/>";
-    message = message + "<strong>" + username + "</strong>" + "<br/>";
-    message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
-    message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
-    message = message + "<strong>" + email + "<strong>" + "<br/>";;
-    message = message + "<strong>" + address + "<strong>" + "<br/>";
     message = message + "<br/>";
     message = message + "</body></html>";
 
@@ -211,11 +213,12 @@ exports.SendRequestRejectOrApprovedMail = async (fromRole, toRoles, notification
         var mailOptions = {
             from: "hms029722@gmail.com",
             to: mailToList,
-            subject: "Client Request for Approval",
+            subject: notificationType,
             html: message
         };
 
-        var mailResult = await SaveRequestNotification(fromRole, toRoles, message, notificationType, request_id);
+        var mailResult = await SaveRequestNotification(manager, client, message, notificationType, request_id);
+
         await transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log("Email Sending Error:", error);

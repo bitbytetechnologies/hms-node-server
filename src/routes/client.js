@@ -64,7 +64,7 @@ router.post("/api/client/create_request", async (req, res) => {
         var client = await GetUser(client_user_id);
         var request_id = result.insertId;
 
-        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
+        await SendRequestRejectOrApprovedMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
         res.send(SUCCESS);
 
     }
@@ -98,12 +98,10 @@ router.post("/api/client/feedback", async (req, res) => {
     }
 });
 
-
 router.get("/api/client_request/:id", async (req, res) => {
     try {
-
         var id = req.params.id
-        let query = `SELECT *  FROM client_requests where  id='${id}' ; `;
+        let query = `SELECT * FROM client_requests where  id='${id}' ; `;
 
         var result = await database.query(query);
 

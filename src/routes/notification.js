@@ -1,6 +1,7 @@
 const auth = require('../middleware/auth');
 const express = require('express');
 const database = require('../startup/dbconfig');
+const { SendRequestMail } = require('../helpers/mail.notifications');
 const { SUCCESS, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 const router = express.Router(); // instead this will work.
@@ -142,7 +143,17 @@ router.post("/api/notifications/mark_read", async (req, res) => {
 
         var result = await database.query(query1);
 
-        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
+        var manager = await await GetUser(client_user_id);
+        var client = await GetUser(client_user_id);
+        var request = await GetRequest(request_id)
+
+        var notification_type = "Client Request Approved";
+
+        if (approved === 2) {
+            notification_type = "Client Request Rejected";
+        }
+
+        await SendRequestMail(manager, client, notification_type, request_id, request);  // 1 is Notification Type
 
         if (!result[0]) {
             SUCCESS.result = null;

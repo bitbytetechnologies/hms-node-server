@@ -35,6 +35,8 @@ router.post("/api/client/create_request", async (req, res) => {
             request_status,
             from_date,
             to_date,
+            from_time,
+            to_time,
             req_hours
         ];
 
@@ -47,8 +49,10 @@ router.post("/api/client/create_request", async (req, res) => {
                                                     request_status,
                                                     from_date,
                                                     to_date,
+                                                    from_time,
+                                                    to_time,
                                                     req_hours
-                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
 
         var result = await database.query(query, params);
 
@@ -89,8 +93,8 @@ router.post("/api/client/feedback", async (req, res) => {
         return res.status(200).send(SUCCESS);
 
     } catch (error) {
-        console.log(error);
-        return res.status(401).send(FAIL);
+        SOME_THONG_WENTWRONG.message = error.message;
+        return res.status(401).send(SOME_THONG_WENTWRONG);
     }
 });
 

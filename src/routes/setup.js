@@ -7,11 +7,9 @@ const database = require('../startup/dbconfig');
 const router = express.Router(); // instead this will work.
 
 var SUCCESS = { code: 1, success: true, message: "Success", result: null };
-var FAIL = { code: 0, success: false, message: "Fail" };
 var SOME_THONG_WENTWRONG = { code: 0, success: false, message: "Something went wrong" };
 
 
-var INVALID_INPUT = { code: 0, success: false, message: "Invalid input's", result: null };
 
 router.get("/api/setups/roles", async (req, res) => {
     try {

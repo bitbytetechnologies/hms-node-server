@@ -22,6 +22,9 @@ exports.SendUserMail = async (userObject) => {
 
     var mailToList = email;
 
+    // var date = moment(new Date());
+    // date = date.clone().tz("Australia/Sydney");
+
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
     message = message + "<br/><br/><br/><br/>";
@@ -86,8 +89,13 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
 
     var mailToList = await componseToList(toRoles);
 
+    var date = moment(new Date());
+    date = date.clone().tz("Australia/Sydney");
+
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
+    //message = message + "<strong> Dated : " + date.toString() + "</strong>";
+
     message = message + "<br/><br/>";
     message = message + "Dear Management,";
     message = message + "<br/>";
@@ -153,6 +161,9 @@ exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, req
     const { username, nationality, mobile_no, email, address } = fromRole;
 
     var mailToList = toRoles.email;
+
+    // var date = moment(new Date());
+    // date = date.clone().tz("Australia/Sydney");
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
@@ -224,6 +235,9 @@ exports.SendRequestApprovalToManagement = async (fromRole, toRoles, notification
     const request_id = clientRequest.id;
 
     var mailToList = await componseToList(toRoles);
+
+    // var date = moment(new Date());
+    // date = date.clone().tz("Australia/Sydney");
 
     let message = "<html><head></head><body>";
     message = message + "<strong> Dated : " + new Date().toString() + "</strong>";

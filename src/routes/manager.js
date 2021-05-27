@@ -31,6 +31,8 @@ router.post("/api/managers/create_request", async (req, res) => {
             request_status,
             from_date,
             to_date,
+            from_time,
+            to_time,
             req_hours
         ];
 
@@ -43,8 +45,10 @@ router.post("/api/managers/create_request", async (req, res) => {
                                                     request_status,
                                                     from_date,
                                                     to_date,
+                                                    from_time,
+                                                    to_time,
                                                     req_hours
-                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ); `;
+                                        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,? ); `;
 
         var result = await database.query(query, params);
 

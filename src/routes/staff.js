@@ -6,6 +6,11 @@ const { GetUser, GetManagers, GetRequest, GetRoster } = require('../helpers/data
 const { SendRequestApprovalToManagement } = require('../helpers/mail.notifications');
 let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
+const moment = require('moment-timezone');
+
+//var date = moment(new Date());
+//date = date.clone().tz("Australia/Sydney");
+
 router.post("/api/staff/approve_roster", async (req, res) => {
 
     var data = req.body;
@@ -65,7 +70,8 @@ router.post("/api/staff/progress", async (req, res) => {
         var clientRequest = await GetRequest(roster.req_id);
 
         roster_date = roster_date.toString();
-
+        //var date = moment(new Date());
+        //date = date.clone().tz("Australia/Sydney");
         //Date Parameter Format : yy-mm-dd 
         let query = `INSERT INTO staff_progress (date, roster_id, staff_id, roster_date, from_time, to_time, details, bill_amount) 
                      VALUES( NOW(),  ${roster_id}, ${staff_id}, '${roster_date}', '${from_time}', '${to_time}', '${details}', '${bill_amount}' ); `;

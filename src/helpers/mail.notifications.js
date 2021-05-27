@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const database = require('../startup/dbconfig');
 const { GetRequest } = require('./data.helper');
+const moment = require('moment-timezone');
 let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers/app_messages');
 
 const componseToList = async (toRoles) => {
@@ -158,6 +159,81 @@ exports.SendRequestMail = async (fromRole, toRoles, notificationType, request_id
 
 }
 
+exports.SendRequestRejectOrApprovedMail = async (fromRole, toRoles, notificationType, request_id, client_request) => {
+
+    const { username, nationality, mobile_no, email, address } = fromRole;
+
+    console.log(client_request)
+
+    var mailToList = await componseToList(toRoles);
+
+    var date = moment(new Date());
+    date = date.clone().tz("Australia/Sydney");
+
+    let message = "<html><head></head><body>";
+    message = message + "<strong> Dated : " + new Date().toString() + "</strong>";
+    //message = message + "<strong> Dated : " + date.toString() + "</strong>";
+
+    message = message + "<br/><br/>";
+    message = message + "Dear Management,";
+    message = message + "<br/>";
+    message = message + "Please do accept Test Notification:-" + "<br/>";
+    message = message + "<i>City   :    " + client_request.city + "</i><br/>";
+    message = message + "<i>Country   : " + client_request.country + "</i><br/>";
+    message = message + "<i>From Date : " + client_request.from_date + "</i><br/>";
+    message = message + "<i>To Date   : " + client_request.to_date + "</i><br/>";
+    message = message + "<i>From Time : " + client_request.from_time + "</i><br/>";
+    message = message + "<i>From Time : " + client_request.to_time + "</i><br/>";
+    message = message + "<br/><br/>";
+    message = message + "</strong><i>Regards</i> </strong>";
+    message = message + "<br/>";
+    message = message + "<strong>" + username + "</strong>" + "<br/>";
+    message = message + "<strong>" + nationality + "<strong>" + "<br/>";;
+    message = message + "<strong>" + mobile_no + "<strong>" + "<br/>";;
+    message = message + "<strong>" + email + "<strong>" + "<br/>";;
+    message = message + "<strong>" + address + "<strong>" + "<br/>";
+    message = message + "<br/>";
+    message = message + "</body></html>";
+
+    try {
+        var transporter = nodemailer.createTransport({
+            //service: 'googlemail.com',
+            //host: "smtp.googlemail.com",
+            //port: 465,
+            service: 'gmail',
+            //secure: true,
+            auth: {
+                user: "hms029722@gmail.com",
+                pass: "#1234567"
+            }
+        });
+
+        var mailOptions = {
+            from: "hms029722@gmail.com",
+            to: mailToList,
+            subject: "Client Request for Approval",
+            html: message
+        };
+
+        var mailResult = await SaveRequestNotification(fromRole, toRoles, message, notificationType, request_id);
+        await transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log("Email Sending Error:", error);
+            } else {
+                console.log("Email Sent: " + info.response);
+            }
+        });
+
+        SUCCESS.result = message;
+        return SUCCESS;
+
+    } catch (error) {
+        console.log(error.message + "  ---- ");
+        FAIL.message = error.message;
+        return FAIL;
+    }
+
+}
 
 exports.SendRequestToStaffMail = async (fromRole, toRoles, notificationType, request_id, roster) => {
 

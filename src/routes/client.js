@@ -7,7 +7,7 @@ let { FAIL, SUCCESS, INVALID_INPUT, SOME_THONG_WENTWRONG } = require('../helpers
 const { } = require('../routes/notification');
 
 router.post("/api/client/create_request", async (req, res) => {
-    let { datetime, client_user_id, loc_attu, loc_long, request_status, from_date, to_date, req_hours } = req.body;
+    let { datetime, client_user_id, loc_attu, loc_long, request_status, from_date, to_date, from_time, to_time, req_hours } = req.body;
 
     if (!datetime || !client_user_id || !loc_attu || !loc_long || !from_date || !to_date || !req_hours) {
         INVALID_INPUT.result = req.body;
@@ -95,6 +95,29 @@ router.post("/api/client/feedback", async (req, res) => {
     } catch (error) {
         SOME_THONG_WENTWRONG.message = error.message;
         return res.status(401).send(SOME_THONG_WENTWRONG);
+    }
+});
+
+
+router.get("/api/client_request/:id", async (req, res) => {
+    try {
+
+        var id = req.params.id
+        let query = `SELECT *  FROM client_requests where  id='${id}' ; `;
+
+        var result = await database.query(query);
+
+        if (!result[0]) {
+            SUCCESS.result = null;
+            return res.status(200).send(SUCCESS);
+        }
+
+        SUCCESS.result = result;
+        return res.status(200).send(SUCCESS);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(401).send(FAIL);
     }
 });
 

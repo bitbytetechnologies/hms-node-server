@@ -142,6 +142,8 @@ router.post("/api/notifications/mark_read", async (req, res) => {
 
         var result = await database.query(query1);
 
+        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
+
         if (!result[0]) {
             SUCCESS.result = null;
             return res.status(200).send(SUCCESS);

@@ -64,7 +64,7 @@ router.post("/api/client/create_request", async (req, res) => {
         var client = await GetUser(client_user_id);
         var request_id = result.insertId;
 
-        await SendRequestRejectOrApprovedMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
+        await SendRequestMail(client, managers, "Client Request", request_id, client_request);  // 1 is Notification Type
         res.send(SUCCESS);
 
     }
